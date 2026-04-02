@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>∞ AURORA — The Most Beautiful Real-Estate Site 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@500;600;700&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    :root {
+      --aurora1: #00f5ff;
+      --aurora2: #7000ff;
+      --aurora3: #ff0af5;
+      --bg: #0a0a1f;
+      --card: rgba(20,20,40,0.6);
+      --text: #e0e7ff;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 20% 80%, rgba(120,119,198,0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,119,198,0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120,219,255,0.2) 0%, transparent 50%);
+    }
+
+    /* Animated Aurora Navbar */
+    nav {
+      position: fixed;
+      top: 30px; left: 50%; transform: translateX(-50%);
+      background: rgba(10,10,31,0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,245,255,0.2);
+      border-radius: 60px;
+      padding: 1rem 3rem;
+      z-index: 9999;
+      box-shadow: 0 20px 60px rgba(0,245,255,0.2);
+    }
+    .nav-inner {
+      display: flex; align-items: center; gap: 4rem;
+    }
+    .logo {
+      font-family: 'Clash Display', sans-serif;
+      font-size: 2.8rem;
+      background: linear-gradient(90deg, var(--aurora1), var(--aurora3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+    .nav-links a {
+      color: #c4d0ff;
+      text-decoration: none;
+      font-weight: 500;
+      position: relative;
+      transition: 0.4s;
+    }
+    .nav-links a:hover {
+      color: var(--aurora1);
+      text-shadow: 0 0 20px var(--aurora1);
+    }
+
+    /* Full-screen Hero with 3D Parallax Houses */
+    .hero {
+      height: 100vh;
+      perspective: 1500px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #0a0a1f 0%, #1a0033 100%);
+    }
+    .parallax-house {
+      position: absolute;
+      border-radius: 24px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+      transition: transform 0.1s;
+      opacity: 0;
+    }
+    .house1 { width: 420px; top: 15%; left: 5%; transform: translateZ(-200px); }
+    .house2 { width: 500px; top: 20%; right: 5%; transform: translateZ(-400px); }
+    .house3 { width: 380px; bottom: 15%; left: 12%; transform: translateZ(-100px); }
+    .house4 { width: 460px; bottom: 20%; right: 10%; transform: translateZ(-300px); }
+
+    .hero-content {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+    }
+    .hero h1 {
+      font-family: 'Clash Display', sans-serif;
+      font-size: 9rem;
+      line-height: 0.9;
+      background: linear-gradient(135deg, var(--aurora1), var(--aurora2), var(--aurora3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+      opacity: 0;
+      transform: translateY(100px);
+    }
+    .hero p {
+      font-size: 1.8rem;
+      opacity: 0.9;
+      opacity: 0;
+      transform: translateY(60px);
+    }
+
+    /* Floating Glass Search */
+    .search-box {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10,10,31,0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,245,255,0.3);
+      border-radius: 60px;
+      padding: 1.5rem 3rem;
+      display: flex;
+      gap: 1.5rem;
+      box-shadow: 0 30px 80px rgba(0,245,255,0.3);
+    }
+    .search-box input {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.3rem;
+      width: 400px;
+      outline: none;
+    }
+    .search-box button {
+      background: linear-gradient(135deg, var(--aurora1), var(--aurora3));
+      color: black;
+      border: none;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: 0.4s;
+    }
+    .search-box button:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 40px var(--aurora1);
+    }
+
+    /* 3D Property Grid */
+    .properties {
+      padding: 10rem 8%;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+      gap: 4rem;
+      perspective: 2000px;
+    }
+    .property-card {
+      background: var(--card);
+      border-radius: 32px;
+      overflow: hidden;
+      border: 1px solid rgba(0,245,255,0.2);
+      cursor: pointer;
+      transition: 0.8s;
+      opacity: 0;
+      transform: translateY(100px) rotateX(-20deg);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    }
+    .property-card:hover {
+      transform: translateY(-30px) rotateX(0deg);
+      box-shadow: 0 50px 120px rgba(0,245,255,0.4);
+    }
+    .property-card img {
+      width: 100%;
+      height: 340px;
+      object-fit: cover;
+      transition: 0.8s;
+    }
+    .property-card:hover img {
+      transform: scale(1.1);
+    }
+    .card-info {
+      padding: 2rem;
+    }
+    .price {
+      font-size: 2.4rem;
+      background: linear-gradient(135deg, var(--aurora1), var(--aurora3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+
+    /* Final CTA Video */
+    .final-cta {
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+    .final-cta video {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: brightness(0.8);
+    }
+    .cta-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(transparent 30%, var(--bg));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .cta-text h2 {
+      font-size: 6rem;
+      background: linear-gradient(135deg, var(--aurora1), var(--aurora3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <div class="logo">AURORA</div>
+      <div class="nav-links">
+        <a href="#">Properties</a>
+        <a href="#">Virtual Tours</a>
+        <a href="#">Concierge</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-bg"></div>
+
+    <img src="https://images.unsplash.com/photo-1613490493576-7fbeec5325f3?q=80&w=2940" class="parallax-house house1">
+    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2940" class="parallax-house house2">
+    <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2940" class="parallax-house house3">
+    <img src="https://images.unsplash.com/photo-1582719471384-8949374d0ef9?q=80&w=2940" class="parallax-house house4">
+
+    <div class="hero-content">
+      <h1>BEYOND<br>LUXURY</h1>
+      <p>The world’s most extraordinary homes</p>
+    </div>
+
+    <div class="search-box">
+      <input type="text" placeholder="Dubai, Maldives, Swiss Alps...">
+      <button><i class="fas fa-search"></i></button>
+    </div>
+  </section>
+
+  <div class="properties" id="grid"></div>
+
+  <!-- Final cinematic CTA -->
+  <section class="final-cta">
+    <video autoplay muted loop playsinline>
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-drone-flight-over-luxury-villas-at-sunset-3335-large.mp4" type="video/mp4">
+    </video>
+    <div class="cta-overlay">
+      <div class="cta-text">
+        <h2>Your Next Chapter<br>Begins Here</h2>
+        <p style="font-size:1.6rem; margin-top:2rem; opacity:0.9;">Only the rarest properties. Only for you.</p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Mouse parallax on houses
+    document.addEventListener('mousemove', (e) => {
+      const { clientX, clientY } = e;
+      const x = (clientX / window.innerWidth) * 100;
+      const y = (clientY / window.innerHeight) * 100;
+
+      gsap.to('.house1', { x: x * 0.3, y: y * 0.3, rotationY: x * 0.05, ease: "none" });
+      gsap.to('.house2', { x: -x * 0.4, y: -y * 0.4, rotationY: -x * 0.05, ease: "none" });
+      gsap.to('.house3', { x: x * 0.2, y: y * 0.2, rotationY: x * 0.03, ease: "none" });
+      gsap.to('.house4', { x: -x * 0.3, y: -y * 0.3, rotationY: -x * 0.04, ease: "none" });
+    });
+
+    // Hero entrance
+    gsap.to(".hero h1", { opacity:1, y:0, duration:2, ease:"power4.out" });
+    gsap.to(".hero p", { opacity:1, y:0, duration:1.6, delay:0.8 });
+    gsap.to(".parallax-house", { opacity:1, duration:3, stagger:0.4, ease:"power3.out" });
+
+    // Properties
+    const homes = [
+      {img:"https://images.unsplash.com/photo-1613490493576-7fbeec5325f3?q=80&w=2940", price:"$42M", title:"Aurora Sky Villa"},
+      {img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2940", price:"$89M", title:"Crystal Ocean Estate"},
+      {img:"https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2940", price:"$125M", title:"Neon Horizon"},
+      {img:"https://images.unsplash.com/photo-1582719471384-8949374d0ef9?q=80&w=2940", price:"$68M", title:"Quantum Retreat"},
+      {img:"https://images.unsplash.com/photo-1600566752355-35792bedcfea?q=80&w=2940", price:"$55M", title:"Stellar Penthouse"},
+      {img:"https://images.unsplash.com/photo-1613977257363-707ba6527efa?q=80&w=2940", price:"$97M", title:"Elysium Palace"}
+    ];
+
+    const grid = document.getElementById('grid');
+    homes.forEach((h, i) => {
+      const card = document.createElement('div');
+      card.className = 'property-card';
+      card.innerHTML = `
+        <img src="${h.img}" alt="${h.title}">
+        <div class="card-info">
+          <div class="price">${h.price}</div>
+          <h3>${h.title}</h3>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    gsap.utils.toArray('.property-card').forEach((card, i) => {
+      gsap.to(card, {
+        opacity: 1,
+        y: 0,
+        rotationX: 0,
+        duration: 1.4,
+        delay: i * 0.2,
+        ease: "back.out(1.4)",
+        scrollTrigger: { trigger: card, start: "top 85%" }
+      });
+    });
+  </script>
+</body>
+</html>
