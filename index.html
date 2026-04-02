@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fashion Hali Style Store</title>
+
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+<style>
+.hero {
+  background: url('https://images.unsplash.com/photo-1521335629791-ce4aec67dd47') center/cover;
+}
+.product:hover { transform: scale(1.03); transition: 0.3s; }
+</style>
+</head>
+
+<body class="bg-gray-50">
+
+<!-- HEADER -->
+<header class="bg-white shadow sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto flex justify-between p-4">
+    <h1 class="text-2xl font-bold">FashionHali Clone</h1>
+    <nav class="space-x-6 font-medium">
+      <a href="#">Home</a>
+      <a href="#">Collections</a>
+      <a href="#">Shop</a>
+      <a href="#">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero h-[500px] flex items-center justify-center text-white text-center">
+  <div>
+    <h2 class="text-5xl font-bold mb-4">Luxury Carpet Collection</h2>
+    <p class="mb-6">Premium quality, modern & classic designs</p>
+    <button class="bg-black px-6 py-3 rounded text-white">Shop Now</button>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="max-w-7xl mx-auto py-12 grid md:grid-cols-3 gap-6">
+  <div class="bg-white shadow p-6 text-center">Modern Rugs</div>
+  <div class="bg-white shadow p-6 text-center">Classic Rugs</div>
+  <div class="bg-white shadow p-6 text-center">Luxury Series</div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="max-w-7xl mx-auto py-12">
+  <h3 class="text-3xl font-bold mb-6 text-center">Featured Products</h3>
+
+  <div class="grid md:grid-cols-4 gap-6">
+
+    <div class="product bg-white shadow rounded p-4">
+      <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" class="rounded mb-3">
+      <h4 class="font-semibold">Premium Rug</h4>
+      <p class="text-gray-600">₺3,499</p>
+      <button class="bg-black text-white w-full mt-3 py-2 rounded">Add to Cart</button>
+    </div>
+
+    <div class="product bg-white shadow rounded p-4">
+      <img src="https://images.unsplash.com/photo-1540574163026-643ea20ade25" class="rounded mb-3">
+      <h4 class="font-semibold">Modern Carpet</h4>
+      <p class="text-gray-600">₺2,899</p>
+      <button class="bg-black text-white w-full mt-3 py-2 rounded">Add to Cart</button>
+    </div>
+
+    <div class="product bg-white shadow rounded p-4">
+      <img src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf" class="rounded mb-3">
+      <h4 class="font-semibold">Luxury Rug</h4>
+      <p class="text-gray-600">₺4,250</p>
+      <button class="bg-black text-white w-full mt-3 py-2 rounded">Add to Cart</button>
+    </div>
+
+    <div class="product bg-white shadow rounded p-4">
+      <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc" class="rounded mb-3">
+      <h4 class="font-semibold">Classic Design</h4>
+      <p class="text-gray-600">₺3,100</p>
+      <button class="bg-black text-white w-full mt-3 py-2 rounded">Add to Cart</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-black text-white text-center py-8 mt-12">
+  © 2026 Fashion Style Store — All Rights Reserved
+</footer>
+
+</body>
+</html>
