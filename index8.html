@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AETHER — Video Background Luxury Real Estate 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    :root {
+      --white: #ffffff;
+      --offwhite: #f8f8f8;
+      --gold: #c9a96e;
+      --dark-gold: #a67c52;
+      --gray: #666;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #000;
+      color: white;
+      overflow-x: hidden;
+    }
+    h1,h2,h3 { font-family: 'Cinzel', serif; }
+
+    /* Full-screen video hero */
+    .hero {
+      height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero video {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: brightness(0.7);
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.8));
+    }
+
+    /* Elegant centered search bar (totally different style) */
+    .search-section {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 1100px;
+      z-index: 10;
+    }
+    .search-container {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(20px);
+      border-radius: 60px;
+      padding: 1.2rem 2rem;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr auto;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .search-container input,
+    .search-container select {
+      padding: 1.2rem 1.8rem;
+      border: none;
+      background: transparent;
+      font-size: 1.1rem;
+      color: #333;
+      outline: none;
+    }
+    .search-container input::placeholder {
+      color: #777;
+    }
+    .search-btn {
+      background: var(--gold);
+      color: black;
+      border: none;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      font-size: 1.6rem;
+      cursor: pointer;
+      transition: 0.4s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .search-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 40px rgba(201,169,110,0.6);
+    }
+
+    /* Minimal navbar */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      padding: 2rem 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+    .logo {
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 6px;
+    }
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      margin: 0 2rem;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    /* Properties section */
+    .properties {
+      max-width: 1600px;
+      margin: 8rem auto;
+      padding: 0 4rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: 4rem;
+    }
+    .property {
+      background: white;
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      cursor: pointer;
+      transition: 0.6s;
+    }
+    .property:hover {
+      transform: translateY(-20px);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.25);
+    }
+    .property img {
+      width: 100%;
+      height: 420px;
+      object-fit: cover;
+    }
+    .property-info {
+      padding: 2.5rem;
+      color: #333;
+    }
+    .price {
+      font-size: 2.6rem;
+      color: var(--gold);
+      font-weight: 700;
+    }
+    .title {
+      font-size: 2rem;
+      margin: 1rem 0;
+      color: #222;
+    }
+    .location {
+      color: var(--gray);
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 32px;
+      max-width: 1100px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 3rem;
+      text-align: center;
+      background: linear-gradient(135deg, #f8f5f0, white);
+    }
+    .modal-header h2 {
+      font-size: 3.5rem;
+      color: #222;
+    }
+    .modal-price {
+      font-size: 3rem;
+      color: var(--gold);
+      margin: 1rem 0;
+    }
+    .modal-body {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 3rem;
+      padding: 4rem;
+    }
+    .gallery img {
+      width: 100%;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+    .booking-form {
+      background: #f9f5f0;
+      padding: 2.5rem;
+      border-radius: 24px;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 1.4rem;
+      background: var(--gold);
+      color: black;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 6rem;
+      background: white;
+      color: #888;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">AETHER</div>
+    <div class="nav-links">
+      <a href="#">Properties</a>
+      <a href="#">Destinations</a>
+      <a href="#">Concierge</a>
+      <a href="#">Contact</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <video autoplay muted loop playsinline>
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-luxury-villa-surrounded-by-the-sea-3339-large.mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+
+    <!-- Completely different search bar -->
+    <div class="search-section">
+      <div class="search-container">
+        <input type="text" placeholder="City, Region or Property Name">
+        <select>
+          <option>All Property Types</option>
+          <option>Villa</option>
+          <option>Penthouse</option>
+          <option>Chalet</option>
+          <option>Estate</option>
+        </select>
+        <select>
+          <option>All Destinations</option>
+          <option>Europe</option>
+          <option>Caribbean</option>
+          <option>Middle East</option>
+          <option>Americas</option>
+        </select>
+        <input type="number" placeholder="Max Price">
+        <button class="search-btn">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div class="properties" id="properties"></div>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Villa Celeste</h2>
+        <p class="modal-price">$72,000,000</p>
+        <p style="color:#777; margin-top:1rem;">Capri, Italy</p>
+      </div>
+      <div class="modal-body">
+        <div class="gallery">
+          <img src="https://images.unsplash.com/photo-1613490493576-7fbeec5325f3?q=80&w=2940" alt="">
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2940" alt="">
+        </div>
+        <div class="booking-form">
+          <h3 style="color:#333; margin-bottom:1.5rem;">Private Inquiry</h3>
+          <input type="text" placeholder="Full Name" style="width:100%; padding:1rem; margin:1rem 0; border:1px solid #ddd; border-radius:12px;">
+          <input type="email" placeholder="Email Address" style="width:100%; padding:1rem; margin:1rem 0; border:1px solid #ddd; border-radius:12px;">
+          <input type="tel" placeholder="Telephone" style="width:100%; padding:1rem; margin:1rem 0; border:1px solid #ddd; border-radius:12px;">
+          <textarea placeholder="Your Message" rows="4" style="width:100%; padding:1rem; margin:1rem 0; border:1px solid #ddd; border-radius:12px;"></textarea>
+          <button class="submit-btn">Submit Request</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 AETHER — Curated Global Residences
+  </footer>
+
+  <script>
+    const properties = [
+      {title:"Villa Celeste", price:72000000, location:"Capri, Italy", img:"https://images.unsplash.com/photo-1613490493576-7fbeec5325f3?q=80&w=2940"},
+      {title:"Chalet Orion", price:98000000, location:"Zermatt, Switzerland", img:"https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?q=80&w=2940"},
+      {title:"Palm Island Estate", price:135000000, location:"Dubai", img:"https://images.unsplash.com/photo-1582719471384-8949374d0ef9?q=80&w=2940"},
+      {title:"Ocean Sky Penthouse", price:89000000, location:"Miami Beach", img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2940"}
+    ];
+
+    document.getElementById('properties').innerHTML = properties.map(p => `
+      <div class="property" onclick="document.getElementById('modal').style.display='flex'">
+        <img src="${p.img}" alt="${p.title}">
+        <div class="property-info">
+          <div class="price">$${p.price.toLocaleString()}</div>
+          <div class="title">${p.title}</div>
+          <div class="location"><i class="fas fa-map-marker-alt"></i> ${p.location}</div>
+        </div>
+      </div>
+    `).join('');
+
+    // Close modal
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) this.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
