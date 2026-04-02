@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verde Properties | Elite Real Estate 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root {
+      --green: #228B22;
+      --dark: #0a0a0a;
+      --gray: #1a1a1a;
+      --light: #f5f5f5;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Open Sans', sans-serif; background:var(--dark); color:white; overflow-x:hidden; }
+    h1,h2,h3 { font-family: 'Roboto Slab', serif; }
+
+    /* Navbar */
+    nav {
+      position: fixed;
+      top:0; left:0; right:0;
+      padding: 1.5rem 5%;
+      display:flex; justify-content:space-between; align-items:center;
+      z-index:1000; transition:0.4s;
+    }
+    nav.scrolled {
+      background:rgba(10,10,10,0.95);
+      backdrop-filter:blur(12px);
+      padding:1rem 5%;
+      box-shadow:0 10px 30px rgba(0,0,0,0.6);
+    }
+    .logo { font-size:2.2rem; font-weight:700; color:var(--green); }
+    .nav-links a { color:white; text-decoration:none; margin:0 1.8rem; font-weight:500; position:relative; }
+    .nav-links a::after { content:''; position:absolute; bottom:-8px; left:0; width:0; height:2px; background:var(--green); transition:0.3s; }
+    .nav-links a:hover::after { width:100%; }
+
+    /* Hero */
+    .hero {
+      height:100vh;
+      background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+                  url('https://images.unsplash.com/photo-1600585154363-67eb9e2e209a?q=80&w=3164') center/cover no-repeat;
+      display:flex; align-items:center; justify-content:center; text-align:center;
+    }
+    .hero h1 { font-size:6rem; margin-bottom:1rem; }
+    .hero p { font-size:1.5rem; max-width:800px; margin:0 auto 2rem; }
+
+    /* Search & Filters */
+    .filters-section {
+      padding:6rem 5% 4rem;
+      background:var(--gray);
+    }
+    .search-bar {
+      max-width:800px; margin:0 auto 3rem;
+      position:relative;
+    }
+    .search-bar input {
+      width:100%; padding:1.2rem 4rem 1.2rem 1.5rem;
+      border:none; border-radius:50px;
+      font-size:1.1rem; background:rgba(255,255,255,0.1);
+      color:white; backdrop-filter:blur(10px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .search-bar button {
+      position:absolute; right:8px; top:50%; transform:translateY(-50%);
+      background:var(--green); border:none; width:50px; height:50px;
+      border-radius:50%; color:white; font-size:1.3rem; cursor:pointer;
+      box-shadow: 0 5px 15px rgba(34,139,34,0.3);
+    }
+
+    .filters {
+      display:flex; flex-wrap:wrap; gap:1rem; justify-content:center; margin-bottom:3rem;
+    }
+    select, .price-range {
+      padding:0.9rem 1.5rem; border:none; border-radius:50px;
+      background:rgba(255,255,255,0.1); color:white; font-size:1rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .price-range input { width:120px; }
+
+    /* View Toggle */
+    .view-toggle {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .view-toggle button {
+      padding: 0.8rem 2rem;
+      background: transparent;
+      border: 1px solid var(--green);
+      color: var(--green);
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      margin: 0 0.5rem;
+      transition: 0.3s;
+      box-shadow: 0 4px 10px rgba(34,139,34,0.1);
+    }
+    .view-toggle button.active {
+      background: var(--green);
+      color: white;
+      box-shadow: 0 5px 15px rgba(34,139,34,0.3);
+    }
+    .view-toggle button:hover {
+      box-shadow: 0 5px 15px rgba(34,139,34,0.3);
+    }
+
+    /* Properties */
+    #propertiesSection {
+      padding:2rem 5% 8rem;
+    }
+    #gridContainer {
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(380px, 1fr));
+      gap:2.5rem;
+    }
+    .property-card {
+      background:rgba(255,255,255,0.04);
+      border-radius:20px;
+      overflow:hidden;
+      cursor:pointer;
+      transition:0.4s;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      opacity:0;
+      transform:translateY(60px);
+    }
+    .property-card:hover {
+      transform:translateY(-15px);
+      box-shadow: 0 20px 50px rgba(34,139,34,0.2);
+    }
+    .property-card img {
+      width:100%; height:260px; object-fit:cover; transition:0.5s;
+    }
+    .property-card:hover img { transform:scale(1.08); }
+    .property-info {
+      padding:1.6rem;
+    }
+    .property-info h3 { font-size:1.5rem; margin-bottom:0.5rem; }
+    .price { color:var(--green); font-size:1.9rem; font-weight:700; }
+    .location { color:#aaa; font-size:0.95rem; margin:0.5rem 0; }
+    .features { display:flex; gap:1rem; font-size:0.9rem; color:#ccc; margin-top:1rem; }
+
+    #mapContainer { display:none; }
+    #map { height:600px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius:20px; }
+
+    .no-results {
+      text-align:center; padding:4rem; font-size:1.4rem; color:#888;
+    }
+
+    /* Modal */
+    #detailModal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: var(--gray);
+      padding: 2rem;
+      border-radius: 20px;
+      max-width: 900px;
+      width: 90%;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 2rem;
+      cursor: pointer;
+      color: white;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .modal-header h2 { font-size: 2.5rem; }
+    .modal-price { color: var(--green); font-size: 2rem; }
+    .modal-location { font-size: 1.2rem; color: #aaa; margin-bottom: 1rem; }
+    .modal-description { margin: 1rem 0; line-height: 1.6; }
+    .modal-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .modal-feature { display: flex; align-items: center; gap: 0.5rem; }
+    .modal-gallery {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .modal-gallery img {
+      width: 200px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .modal-gallery img:hover { transform: scale(1.05); }
+
+    footer {
+      background:#000; padding:3rem; text-align:center; font-size:0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">VERDE</div>
+    <div class="nav-links">
+      <a href="#">Home</a>
+      <a href="#">Properties</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div>
+      <h1>Elevate Your Lifestyle</h1>
+      <p>Discover premium properties tailored for elite living</p>
+    </div>
+  </section>
+
+  <!-- Search & Filters -->
+  <section class="filters-section">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search by location, name or keyword..." />
+      <button><i class="fas fa-search"></i></button>
+    </div>
+
+    <div class="filters">
+      <select id="typeFilter">
+        <option value="all">All Types</option>
+        <option value="house">House</option>
+        <option value="apartment">Apartment</option>
+        <option value="villa">Villa</option>
+        <option value="penthouse">Penthouse</option>
+      </select>
+
+      <select id="locationFilter">
+        <option value="all">All Locations</option>
+        <option value="Miami">Miami</option>
+        <option value="Los Angeles">Los Angeles</option>
+        <option value="New York">New York</option>
+        <option value="Dubai">Dubai</option>
+        <option value="London">London</option>
+      </select>
+
+      <div class="price-range">
+        <input type="number" id="minPrice" placeholder="Min Price" />
+        <input type="number" id="maxPrice" placeholder="Max Price" />
+      </div>
+
+      <select id="bedsFilter">
+        <option value="0">Any Beds</option>
+        <option value="1">1+</option>
+        <option value="2">2+</option>
+        <option value="3">3+</option>
+        <option value="5">5+</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- Properties Section -->
+  <section id="propertiesSection">
+    <div class="view-toggle">
+      <button id="gridBtn" class="active">Grid View</button>
+      <button id="mapBtn">Map View</button>
+    </div>
+
+    <div id="gridContainer">
+      <!-- JS will fill this -->
+    </div>
+
+    <div id="mapContainer">
+      <div id="map"></div>
+    </div>
+  </section>
+
+  <!-- Detail Modal -->
+  <div id="detailModal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <div class="modal-header">
+        <h2 id="modalTitle"></h2>
+        <span class="modal-price" id="modalPrice"></span>
+      </div>
+      <div class="modal-location" id="modalLocation"></div>
+      <p class="modal-description" id="modalDescription"></p>
+      <div class="modal-features" id="modalFeatures"></div>
+      <div class="modal-gallery" id="modalGallery"></div>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 Verde Properties • Elite Living Redefined
+  </footer>
+
+  <script>
+    // Sample Property Data with details
+    const properties = [
+      { id:1, title:"Oceanfront Villa", price:6850000, location:"Miami", type:"villa", beds:6, baths:7, sqft:8200, img:"https://images.unsplash.com/photo-1613490493576-7fbeec5325f3?q=80&w=2940", lat:25.761681, lng:-80.191788, description:"Stunning oceanfront villa with panoramic views, infinity pool, and private beach access. Modern architecture meets luxury living.", features:["Private Beach", "Infinity Pool", "Home Theater", "Gym"], gallery:["https://images.unsplash.com/photo-1613490493576-7fbeec5325f3?q=80&w=2940", "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2940"] },
+      { id:2, title:"Sky Penthouse", price:14900000, location:"New York", type:"penthouse", beds:4, baths:5, sqft:5800, img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2940", lat:40.730610, lng:-73.935242, description:"Ultra-luxury penthouse in the heart of Manhattan with 360-degree city views, rooftop terrace, and state-of-the-art amenities.", features:["Rooftop Terrace", "Smart Home System", "Spa Bathroom", "Wine Cellar"], gallery:["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2940", "https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2940"] },
+      { id:3, title:"Modern Mansion", price:12500000, location:"Los Angeles", type:"house", beds:8, baths:10, sqft:13500, img:"https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2940", lat:34.052235, lng:-118.243683, description:"Contemporary mansion in the Hollywood Hills featuring expansive living spaces, outdoor entertainment areas, and celebrity-level privacy.", features:["Outdoor Kitchen", "Tennis Court", "Guest House", "Sauna"], gallery:["https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2940", "https://images.unsplash.com/photo-1582719471384-8949374d0ef9?q=80&w=2940"] },
+      { id:4, title:"Palm Jumeirah Villa", price:22000000, location:"Dubai", type:"villa", beds:7, baths:9, sqft:16000, img:"https://images.unsplash.com/photo-1582719471384-8949374d0ef9?q=80&w=2940", lat:25.276987, lng:55.296249, description:"Exquisite villa on Palm Jumeirah with private yacht berth, lush gardens, and unparalleled Arabian Gulf views.", features:["Yacht Berth", "Lush Gardens", "Indoor Pool", "Elevator"], gallery:["https://images.unsplash.com/photo-1582719471384-8949374d0ef9?q=80&w=2940", "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=2940"] },
+      { id:5, title:"Mayfair Residence", price:18500000, location:"London", type:"house", beds:6, baths:6, sqft:7200, img:"https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=2940", lat:51.509865, lng:-0.118092, description:"Elegant Georgian residence in Mayfair, fully renovated with period features, modern conveniences, and a private courtyard.", features:["Private Courtyard", "Period Features", "Underground Parking", "Library"], gallery:["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=2940", "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=2940"] },
+      { id:6, title:"Downtown Loft", price:4200000, location:"New York", type:"apartment", beds:3, baths:3, sqft:3200, img:"https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=2940", lat:40.730610, lng:-73.935242, description:"Spacious industrial loft in downtown NYC with high ceilings, exposed brick, and custom designer finishes.", features:["High Ceilings", "Exposed Brick", "Custom Kitchen", "Art Studio"], gallery:["https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=2940", "https://images.unsplash.com/photo-1613977257365-707ba6527efa?q=80&w=2940"] },
+      { id:7, title:"Beverly Hills Estate", price:29800000, location:"Los Angeles", type:"house", beds:12, baths:15, sqft:25000, img:"https://images.unsplash.com/photo-1613977257365-707ba6527efa?q=80&w=2940", lat:34.052235, lng:-118.243683, description:"Grand estate in Beverly Hills with manicured grounds, multiple pools, and entertainment facilities fit for royalty.", features:["Multiple Pools", "Tennis Court", "Ballroom", "Helipad"], gallery:["https://images.unsplash.com/photo-1613977257365-707ba6527efa?q=80&w=2940", "https://images.unsplash.com/photo-1600566755190-0166f8e5e703?q=80&w=2940"] },
+      { id:8, title:"Sunny Isles Penthouse", price:8900000, location:"Miami", type:"penthouse", beds:5, baths:6, sqft:6100, img:"https://images.unsplash.com/photo-1600566755190-0166f8e5e703?q=80&w=2940", lat:25.761681, lng:-80.191788, description:"Beachfront penthouse in Sunny Isles with wraparound balconies, ocean views, and luxurious spa-like amenities.", features:["Wraparound Balconies", "Ocean Views", "Spa Bathroom", "Private Elevator"], gallery:["https://images.unsplash.com/photo-1600566755190-0166f8e5e703?q=80&w=2940", "https://images.unsplash.com/photo-1613490493576-7fbeec5325f3?q=80&w=2940"] }
+    ];
+
+    let filteredData = properties;
+    let currentView = 'grid';
+    let map = null;
+    let markers = L.layerGroup();
+
+    const gridContainer = document.getElementById('gridContainer');
+    const mapContainer = document.getElementById('mapContainer');
+    const gridBtn = document.getElementById('gridBtn');
+    const mapBtn = document.getElementById('mapBtn');
+    const modal = document.getElementById('detailModal');
+    const closeBtn = document.querySelector('.close-btn');
+
+    function renderGrid(data) {
+      gridContainer.innerHTML = '';
+      if (data.length === 0) {
+        gridContainer.innerHTML = '<div class="no-results">No properties found matching your criteria</div>';
+        return;
+      }
+
+      data.forEach((prop, index) => {
+        const card = document.createElement('div');
+        card.className = 'property-card';
+        card.dataset.id = prop.id;
+        card.style.animationDelay = `${index * 0.1}s`;
+
+        card.innerHTML = `
+          <img src="${prop.img}" alt="${prop.title}">
+          <div class="property-info">
+            <h3>${prop.title}</h3>
+            <div class="location"><i class="fas fa-map-marker-alt"></i> ${prop.location}</div>
+            <div class="price">$${prop.price.toLocaleString()}</div>
+            <div class="features">
+              <span><i class="fas fa-bed"></i> ${prop.beds}</span>
+              <span><i class="fas fa-bath"></i> ${prop.baths}</span>
+              <span><i class="fas fa-ruler-combined"></i> ${prop.sqft.toLocaleString()} sqft</span>
+            </div>
+          </div>
+        `;
+        card.addEventListener('click', () => showDetail(prop));
+        gridContainer.appendChild(card);
+      });
+
+      gsap.from(".property-card", {
+        opacity: 0,
+        y: 80,
+        duration: 0.9,
+        stagger: 0.15,
+        ease: "power3.out"
+      });
+    }
+
+    function showDetail(prop) {
+      document.getElementById('modalTitle').textContent = prop.title;
+      document.getElementById('modalPrice').textContent = `$${prop.price.toLocaleString()}`;
+      document.getElementById('modalLocation').textContent = prop.location;
+      document.getElementById('modalDescription').textContent = prop.description;
+
+      const featuresEl = document.getElementById('modalFeatures');
+      featuresEl.innerHTML = prop.features.map(f => `<div class="modal-feature"><i class="fas fa-check-circle"></i> ${f}</div>`).join('');
+
+      const galleryEl = document.getElementById('modalGallery');
+      galleryEl.innerHTML = prop.gallery.map(url => `<img src="${url}" alt="Gallery Image">`).join('');
+
+      modal.style.display = 'flex';
+    }
+
+    function updateMarkers(data) {
+      markers.clearLayers();
+      if (data.length === 0) {
+        if (map) map.setView([0, 0], 2);
+        return;
+      }
+
+      data.forEach(prop => {
+        const marker = L.marker([prop.lat, prop.lng]).addTo(markers);
+        marker.bindPopup(`
+          <img src="${prop.img}" style="width:200px; height:150px; object-fit:cover; border-radius:10px;">
+          <h3>${prop.title}</h3>
+          <p>$${prop.price.toLocaleString()}</p>
+          <p>${prop.location}</p>
+          <p>Beds: ${prop.beds} • Baths: ${prop.baths} • ${prop.sqft} sqft</p>
+        `);
+        marker.on('click', () => showDetail(prop));
+      });
+
+      if (map && data.length > 0) {
+        map.fitBounds(markers.getBounds().pad(0.5));
+      }
+    }
+
+    function toggleView(view) {
+      currentView = view;
+      gridBtn.classList.toggle('active', view === 'grid');
+      mapBtn.classList.toggle('active', view === 'map');
+      gridContainer.style.display = view === 'grid' ? 'grid' : 'none';
+      mapContainer.style.display = view === 'map' ? 'block' : 'none';
+
+      if (view === 'map' && !map) {
+        map = L.map('map').setView([0, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+        markers.addTo(map);
+      }
+
+      if (view === 'grid') {
+        renderGrid(filteredData);
+      } else {
+        updateMarkers(filteredData);
+      }
+    }
+
+    // Initial render
+    renderGrid(properties);
+    updateMarkers(properties);
+
+    // Filter Logic
+    function filterProperties() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const type = document.getElementById('typeFilter').value;
+      const location = document.getElementById('locationFilter').value;
+      const minPrice = parseInt(document.getElementById('minPrice').value) || 0;
+      const maxPrice = parseInt(document.getElementById('maxPrice').value) || Infinity;
+      const minBeds = parseInt(document.getElementById('bedsFilter').value) || 0;
+
+      filteredData = properties.filter(p => {
+        return (
+          (search === '' || p.title.toLowerCase().includes(search) || p.location.toLowerCase().includes(search)) &&
+          (type === 'all' || p.type === type) &&
+          (location === 'all' || p.location === location) &&
+          (p.price >= minPrice && p.price <= maxPrice) &&
+          (p.beds >= minBeds)
+        );
+      });
+
+      if (currentView === 'grid') {
+        renderGrid(filteredData);
+      }
+      updateMarkers(filteredData);
+    }
+
+    // Event Listeners
+    document.querySelectorAll('#searchInput, #typeFilter, #locationFilter, #minPrice, #maxPrice, #bedsFilter').forEach(el => {
+      el.addEventListener('input', filterProperties);
+      el.addEventListener('change', filterProperties);
+    });
+
+    gridBtn.addEventListener('click', () => toggleView('grid'));
+    mapBtn.addEventListener('click', () => toggleView('map'));
+
+    closeBtn.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+
+    // Navbar scroll
+    window.addEventListener('scroll', () => {
+      document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 100);
+    });
+
+    // GSAP Hero Animation
+    gsap.from(".hero h1", { opacity:0, y:80, duration:1.4, ease:"power4.out" });
+    gsap.from(".hero p", { opacity:0, y:60, duration:1.2, delay:0.6, ease:"power3.out" });
+  </script>
+</body>
+</html>
