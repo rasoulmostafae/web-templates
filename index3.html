@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nova Residences — Future of Luxury Living</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Unica+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.8.1/dist/vanilla-tilt.min.js"></script>
+  <style>
+    :root {
+      --indigo: #4c1d95;
+      --electric: #00f2ff;
+      --dark: #0b0b1f;
+      --glass: rgba(255, 255, 255, 0.05);
+      --border: rgba(255, 255, 255, 0.1);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: linear-gradient(135deg, #0b0b1f 0%, #1a0033 100%);
+      color: white;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Floating Navbar */
+    nav {
+      position: fixed;
+      top: 20px; left: 50%; transform: translateX(-50%);
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 60px;
+      padding: 1rem 3rem;
+      z-index: 1000;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .nav-content {
+      display: flex; align-items: center; gap: 3rem;
+    }
+    .logo {
+      font-family: 'Unica One', cursive;
+      font-size: 2.2rem;
+      background: linear-gradient(90deg, #00f2ff, #9d4edd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-links a {
+      color: white; text-decoration: none; font-weight: 500; opacity: 0.8;
+      transition: 0.3s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--electric); }
+
+    /* Hero */
+    .hero {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url('https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?q=80&w=3264') center/cover;
+      filter: brightness(0.4);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+    .hero h1 {
+      font-size: 7rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #00f2ff, #c77dff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.5rem;
+      opacity: 0.9;
+      max-width: 700px;
+      margin: 0 auto 3rem;
+    }
+
+    /* Filters Bar */
+    .filters-bar {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2rem;
+      margin: -100px auto 4rem;
+      max-width: 1300px;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .filter-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+      gap: 1rem;
+      align-items: center;
+    }
+    .search-box {
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 1rem 1rem 1rem 3.5rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: white;
+      font-size: 1.1rem;
+    }
+    .search-box i {
+      position: absolute;
+      left: 1rem; top: 50%; transform: translateY(-50%);
+      color: var(--electric);
+    }
+    select, .price-input {
+      padding: 1rem 1.5rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: white;
+    }
+
+    /* View Toggle */
+    .view-tabs {
+      display: flex;
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 8px;
+      width: fit-content;
+      margin: 0 auto 3rem;
+    }
+    .tab {
+      padding: 12px 30px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.4s;
+    }
+    .tab.active {
+      background: linear-gradient(90deg, #00f2ff, #9d4edd);
+      color: black;
+      font-weight: 600;
+    }
+
+    /* Grid & Map */
+    .content-area {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    #gridView {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 2.5rem;
+    }
+    .property-card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .property-card:hover {
+      transform: translateY(-20px) scale(1.02);
+      box-shadow: 0 40px 80px rgba(0, 242, 255, 0.2);
+    }
+    .property-card img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+    }
+    .card-content {
+      padding: 1.8rem;
+    }
+    .price {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #00f2ff, #9d4edd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .title { font-size: 1.5rem; margin: 0.5rem 0; }
+    .location { color: #aaa; font-size: 1rem; }
+    .specs {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: #ccc;
+    }
+
+    #mapView {
+      display: none;
+      height: 700px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+      border: 1px solid var(--border);
+    }
+
+    footer {
+      text-align: center;
+      padding: 4rem;
+      margin-top: 6rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-content">
+      <div class="logo">NOVA</div>
+      <div class="nav-links">
+        <a href="#">Properties</a>
+        <a href="#">About</a>
+        <a href="#">Services</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Future Living<br>Starts Here</h1>
+      <p>Ultra-luxury residences in the world’s most exclusive destinations</p>
+    </div>
+  </section>
+
+  <div class="filters-bar">
+    <div class="filter-row">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Dubai, Miami, New York..." />
+      </div>
+      <select id="typeFilter">
+        <option>All Types</option>
+        <option>Villa</option>
+        <option>Penthouse</option>
+        <option>Mansion</option>
+        <option>Apartment</option>
+      </select>
+      <select id="locationFilter">
+        <option>All Cities</option>
+        <option>Miami</option>
+        <option>Dubai</option>
+        <option>Los Angeles</option>
+        <option>New York</option>
+        <option>London</option>
+      </select>
+      <div class="price-input">
+        <input type="number" id="minPrice" placeholder="Min Price">
+      </div>
+      <div class="price-input">
+        <input type="number" id="maxPrice" placeholder="Max Price">
+      </div>
+      <button style="background:linear-gradient(90deg,#00f2ff,#9d4edd);border:none;padding:1rem 2rem;border-radius:16px;color:black;font-weight:600;cursor:pointer;">
+        Search
+      </button>
+    </div>
+  </div>
+
+  <div class="content-area">
+    <div class="view-tabs">
+      <div class="tab active" id="gridTab">Grid View</div>
+      <div class="tab" id="mapTab">Map View</div>
+    </div>
+
+    <div id="gridView"></div>
+    <div id="mapView"></div>
+  </div>
+
+  <footer>
+    © 2025 Nova Residences — Redefining Luxury Real Estate
+  </footer>
+
+  <script>
+    const properties = [
+      {title:"Sky Palace Penthouse", price:32000000, location:"Dubai", type:"penthouse", beds:5, baths:7, sqft:12000, img:"https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?q=80&w=2940", lat:25.2048, lng:55.2708},
+      {title:"Ocean Horizon Villa", price:18500000, location:"Miami", type:"villa", beds:7, baths:9, sqft:14000, img:"https://images.unsplash.com/photo-1613490493576-7fbeec5325f3?q=80&w=2940", lat:25.7617, lng:-80.1918},
+      {title:"The Glass House", price:45000000, location:"Los Angeles", type:"mansion", beds:10, baths:14, sqft:28000, img:"https://images.unsplash.com/photo-1613977257363-707ba6527efa?q=80&w=2940", lat:34.0522, lng:-118.2437},
+      {title:"Central Park Triplex", price:68000000, location:"New York", type:"penthouse", beds:6, baths:8, sqft:11000, img:"https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?q=80&w=2940", lat:40.7851, lng:-73.9683},
+      {title:"Mayfair Manor", price:52000000, location:"London", type:"mansion", beds:12, baths:15, sqft:22000, img:"https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=2940", lat:51.5074, lng:-0.1278},
+    ];
+
+    let map, markersLayer;
+    const gridView = document.getElementById('gridView');
+    const mapView = document.getElementById('mapView');
+
+    function renderGrid(data) {
+      gridView.innerHTML = data.map(p => `
+        <div class="property-card" data-tilt data-tilt-glare data-tilt-max-glare="0.5">
+          <img src="${p.img}" alt="${p.title}">
+          <div class="card-content">
+            <div class="price">$${p.price.toLocaleString()}</div>
+            <div class="title">${p.title}</div>
+            <div class="location"><i class="fas fa-map-marker-alt"></i> ${p.location}</div>
+            <div class="specs">
+              <span><i class="fas fa-bed"></i> ${p.beds}</span>
+              <span><i class="fas fa-bath"></i> ${p.baths}</span>
+              <span><i class="fas fa-ruler-combined"></i> ${p.sqft.toLocaleString()} sqft</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // 3D Tilt Effect
+      VanillaTilt.init(document.querySelectorAll(".property-card"), {
+        max: 15,
+        speed: 400,
+        glare: true,
+        "max-glare": 0.5,
+      });
+    }
+
+    function initMap() {
+      map = L.map('mapView').setView([20, 0], 2);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+      markersLayer = L.layerGroup().addTo(map);
+    }
+
+    function updateMap(data) {
+      if (!map) initMap();
+      markersLayer.clearLayers();
+      data.forEach(p => {
+        const marker = L.marker([p.lat, p.lng]).addTo(markersLayer);
+        marker.bindPopup(`
+          <b>${p.title}</b><br>
+          $${p.price.toLocaleString()}<br>
+          ${p.location} • ${p.beds} bed • ${p.sqft} sqft
+        `);
+      });
+    }
+
+    function filterAndRender() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const type = document.getElementById('typeFilter').value.toLowerCase();
+      const location = document.getElementById('locationFilter').value.toLowerCase();
+
+      const filtered = properties.filter(p => {
+        return (!search || p.location.toLowerCase().includes(search) || p.title.toLowerCase().includes(search)) &&
+               (type === 'all types' || p.type === type) &&
+               (location === 'all cities' || p.location.toLowerCase() === location);
+      });
+
+      renderGrid(filtered);
+      updateMap(filtered);
+    }
+
+    // View Switch
+    document.getElementById('gridTab').onclick = () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('gridTab').classList.add('active');
+      gridView.style.display = 'grid';
+      mapView.style.display = 'none';
+    };
+    document.getElementById('mapTab').onclick = () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('mapTab').classList.add('active');
+      gridView.style.display = 'none';
+      mapView.style.display = 'block';
+      setTimeout(() => map.invalidateSize(), 300);
+      updateMap(properties);
+    };
+
+    // Init
+    renderGrid(properties);
+    gsap.from(".hero h1", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out" });
+    gsap.from(".hero p", { y: 80, opacity: 0, duration: 1.2, delay: 0.8 });
+    document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', filterAndRender));
+  </script>
+</body>
+</html>
